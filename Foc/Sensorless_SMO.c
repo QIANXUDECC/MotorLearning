@@ -1,4 +1,4 @@
-﻿/*
+/*
 作者：拾小白电控
 日期：2024.4.20
 qq群：1群：860465413
@@ -17,8 +17,8 @@ SMO_Motor SMO_MotorPare = SMO_Motor_DEFAULTS;
 IQAtan IQAtan_Pare = IQAtan_DEFAULTS;
 
 extern uint16_t VF_AngleJZ;
-float Angle_CompCoff = 0.13; // 角度补偿系数，在线调节系数，观察输出能力
-// 原来是0.15，vd、vq输出都为正，调节为0.11时vd能为负，但快速启动会失败。
+float Angle_CompCoff = 0.15f; // 角度补偿系数，在线调节系数，观察输出能力
+// 优化：增大补偿系数，改善角度滞后问题，提高动态响应
 int16_t Angle_Comp = 0;
 
 float Limit_Sat(float Uint, float U_max, float U_min) // 限制赋值函数
@@ -47,9 +47,9 @@ void SMO_Pare_init(void) // 电机参数初始化
 	// 计算滑膜 观测器系数， 根据实际电机调节滤波系数  Kslide和 Kslf
 	Angle_SMOPare.Fsmopos = SMO_MotorPare.Fsmopos;
 	Angle_SMOPare.Gsmopos = SMO_MotorPare.Gsmopos;
-	Angle_SMOPare.Kslide = 0.17f;		   //
-	Angle_SMOPare.Kslf = 0.06f;			   //
-	Angle_SMOPare.E0 = VOLTAGE_LIM / 4.0f; //  限幅
+	Angle_SMOPare.Kslide = 0.22f;		   // 优化：增大滑模增益，提高观测器响应速度
+	Angle_SMOPare.Kslf = 0.08f;			   // 优化：增大低通滤波系数，提高反电动势提取速度
+	Angle_SMOPare.E0 = VOLTAGE_LIM / 3.0f; // 优化：增大限幅，提高大信号下的观测能力
 	Speed_estPare.speed_coeff = (float)(500 * 60 / (SMO_MotorPare.POLES * 1024.0f));
 }
 
@@ -109,8 +109,8 @@ void Angle_Correct(void)
 	}
 }
 
-float stest1 = 0.2f;
-float stest2 = 0.8f;
+float stest1 = 0.35f; // 优化：增大速度滤波系数，提高动态响应
+float stest2 = 0.65f; // 优化：减小平滑系数，提高速度响应速度
 void SMO_Speedcale(void) // 1ms执行一次
 {
 	Speed_estPare.SpeedK1 = stest1;
@@ -129,8 +129,8 @@ void SMO_Speedcale(void) // 1ms执行一次
 		Speed_estPare.Speed_RPM = 5000;
 	Speed_estPare.old_ele_angleIQ = Speed_estPare.ele_angle;
 
-	// 低通滤波器，备用
-	const float fc = 200;	 // 截止频率
+	// 低通滤波器，优化截止频率
+	const float fc = 300;	 // 优化：提高截止频率，改善速度响应
 	const float Ts = 0.0001; // 采样周期
 	float b = 2 * 3.1415926f * fc * Ts;
 	float alpha = b / (b + 1); // alpha
