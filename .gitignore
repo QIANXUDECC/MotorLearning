@@ -1,0 +1,37 @@
+# Keil MDK编译产物
+*.o
+*.d
+*.crf
+*.dep
+*.lnp
+*.htm
+*.hex
+*.axf
+*.bin
+*.lst
+*.map
+*.sct
+*.cfg
+
+# 工程文件
+*.uvguix.*
+*.uvoptx.*
+*.uvprojx
+*.uvproj
+*.uvopt
+*.uv
+*.launch
+
+# 输出目录
+MDK-ARM/G431TEST/
+MDK-ARM/RTE/
+Listings/
+
+# 临时文件
+*.bak
+*.tmp
+*~
+.DS_Store
+
+# VSCode配置（可选，如果想保留可以不添加）
+Src/.vscode/
